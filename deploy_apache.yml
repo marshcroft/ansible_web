@@ -1,0 +1,68 @@
+---
+- name: Install and configure apache
+  hosts: "{{ webservers }}"
+  become: true
+  pre_tasks:
+  - name: Create Grafana annotation for job start
+    ansible.builtin.uri:
+      url: "{{grafana_url }}/api/annotations"
+      method: POST
+      body_format: json
+      headers:
+        Content-Type: application/json
+        Authorization: "Bearer {{ grafana_token }}"
+      body:
+        text: "Step {{ grafana_job_number }} of {{ grafana_job_total_number }} started"
+        dashboardId: 6
+        panelId: 65
+        tags:
+          - SNOW_Number "{{ ansible_eda.event.number }}"
+          - AAP Workflow ID "{{ tower_workflow_id }}"
+    delegate_to: local
+    
+  tasks:  
+  - name: Ensure Apache is installed
+    package: 
+      name: httpd
+      state: present
+
+  - name: Copy a web page
+    copy:
+      content: |
+        <html>
+        <head><title>Hello World</title></head>
+        <body>Hello World</body>
+        </html>
+      dest: /var/www/html/index.html
+    notify: restart apache
+ 
+  - name: Ensure Service is running
+    service:
+      name: httpd
+      state: started
+      enabled: true
+
+  handlers:
+  - name: restart apache
+    service:
+      name: httpd
+      state: restarted
+      enabled: true
+  
+  post_tasks:
+  - name: Create Grafana annotation for job finish
+    ansible.builtin.uri:
+      url: "{{grafana_url }}/api/annotations"
+      method: POST
+      body_format: json
+      headers:
+        Content-Type: application/json
+        Authorization: "Bearer {{ grafana_token }}"
+      body:
+        text: "Step {{ grafana_job_number }} of {{ grafana_job_total_number }} completed"
+        dashboardId: 6
+        panelId: 65
+        tags:
+          - SNOW_Number "{{ ansible_eda.event.number }}"
+          - AAP Workflow ID "{{ tower_workflow_id }}"
+    delegate_to: local
