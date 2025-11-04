@@ -17,7 +17,6 @@
         panelId: 65
         tags:
           - SNOW_Number "{{ ansible_eda.event.request_number }}"
-          - AAP Workflow ID "{{ tower_workflow_id | default (omit) }}"
     delegate_to: localhost
     run_once: true
     
@@ -65,6 +64,5 @@
         panelId: 65
         tags:
           - SNOW_Number "{{ ansible_eda.event.request_number }}"
-          - AAP Workflow ID "{{ tower_workflow_id | default (omit) }}"
     delegate_to: localhost
     run_once: true
