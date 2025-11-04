@@ -1,6 +1,6 @@
 ---
 - name: Install and configure apache
-  hosts: "{{ webservers }}"
+  hosts: webservers:{{server_to_failover | default (omit) }}:!{{ server_that_failed | default(omit) }}
   become: true
   pre_tasks:
   - name: Create Grafana annotation for job start
