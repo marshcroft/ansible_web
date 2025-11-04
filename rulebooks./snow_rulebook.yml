@@ -1,0 +1,58 @@
+---
+- name: Watch for new snow records and alerts
+  hosts: localhost
+
+  sources:
+     - servicenow.itsm.records:
+         instance:
+           host: https://dev225046.service-now.com
+           username: admin
+           password: "*4PeD5Ia%izR"
+         table: sc_req_item
+         interval: 1
+
+     - servicenow.itsm.records:
+         instance:
+           host: https://dev225046.service-now.com
+           username: admin
+           password: "*4PeD5Ia%izR"
+         table: incident
+         interval: 1
+
+  rules:
+
+    - name: Trigger Request - Deploy New Web Farm
+      condition:
+        event.short_description == "New Webserver Farm" and event.state == '1' or '2'
+      action:
+        run_job_template:
+          name: Ansible_HAProxy_deploy
+          organization: Default
+
+    - name: Trigger Incident - Website is down
+      condition: event.short_description =="website is down"
+      action:
+        run_job_template:
+          name: Apache_Basic
+          organization: Default
+          job_args:
+            extra_vars:
+              apache_config_file: "config1.cfg"
+              snow_url: "https://dev225046.service-now.com/now/sow/record/incident/"
+              task_effective_number: "{{ event.sys_id }}"
+              incident_number: "{{ event.number }}"
+            limit: node1
+
+    - name: Trigger Incident - site is down
+      condition: event.short_description =="site is down"
+      action:
+        run_workflow_template:
+          name: Linux_Workflow
+          organization: Default
+          post_events: true
+          job_args:
+            extra_vars:
+              apache_config_file: "config1.cfg"
+              snow_url: "https://dev225046.service-now.com/now/sow/record/incident/"
+              task_effective_number: "{{ event.sys_id }}"
+              incident_number: "{{ event.number }}"
