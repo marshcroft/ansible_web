@@ -18,7 +18,7 @@
         tags:
           - SNOW_Number "{{ ansible_eda.event.request_number }}"
           - AAP Workflow ID "{{ tower_workflow_id | default (omit) }}"
-    delegate_to: local
+    delegate_to: localhost
     run_once: true
     
   tasks:  
@@ -66,5 +66,5 @@
         tags:
           - SNOW_Number "{{ ansible_eda.event.request_number }}"
           - AAP Workflow ID "{{ tower_workflow_id | default (omit) }}"
-    delegate_to: local
+    delegate_to: localhost
     run_once: true
