@@ -12,7 +12,7 @@
         Content-Type: application/json
         Authorization: "Bearer {{ grafana_token }}"
       body:
-        text: "Step {{ grafana_job_number }} of {{ grafana_job_total_number }} started"
+        text: "Step {{ grafana_job_number | default ('1') }} of {{ grafana_job_total_number | default ('1') }} started"
         dashboardId: 6
         panelId: 65
         tags:
@@ -59,7 +59,7 @@
         Content-Type: application/json
         Authorization: "Bearer {{ grafana_token }}"
       body:
-        text: "Step {{ grafana_job_number }} of {{ grafana_job_total_number }} completed"
+        text: "Step {{ grafana_job_number | default ('1') }} of {{ grafana_job_total_number | default ('1') }} completed"
         dashboardId: 6
         panelId: 65
         tags:
