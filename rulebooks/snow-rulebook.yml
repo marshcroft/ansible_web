@@ -23,14 +23,14 @@
 
     - name: Trigger Request - Deploy New Web Farm
       condition:
-        event.short_description == "New Webserver Farm" and event.state == '1' or '2'
+        event.payload.short_description == "New Webserver Farm" and event.payload.state == '1' or '2'
       action:
         run_job_template:
           name: Ansible_HAProxy_deploy
           organization: Default
 
     - name: Trigger Incident - Website is down
-      condition: event.short_description =="website is down"
+      condition: event.payload.short_description =="website is down"
       action:
         run_job_template:
           name: Apache_Basic
@@ -44,7 +44,7 @@
             limit: node1
 
     - name: Trigger Incident - site is down
-      condition: event.short_description =="site is down"
+      condition: event.payload.short_description =="site is down"
       action:
         run_workflow_template:
           name: Linux_Workflow
