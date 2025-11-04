@@ -16,7 +16,7 @@
         dashboardId: 6
         panelId: 65
         tags:
-          - SNOW_Number "{{ ansible_eda.event.number }}"
+          - SNOW_Number "{{ ansible_eda.event.request_number }}"
           - AAP Workflow ID "{{ tower_workflow_id }}"
     delegate_to: local
     
@@ -63,6 +63,6 @@
         dashboardId: 6
         panelId: 65
         tags:
-          - SNOW_Number "{{ ansible_eda.event.number }}"
+          - SNOW_Number "{{ ansible_eda.event.request_number }}"
           - AAP Workflow ID "{{ tower_workflow_id }}"
     delegate_to: local
