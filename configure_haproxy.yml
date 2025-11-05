@@ -15,4 +15,4 @@
       ansible.builtin.service:
         name: haproxy
         state: restarted
-        enable: true
+        enabled: true
