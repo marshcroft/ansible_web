@@ -1,0 +1,18 @@
+- name: Configure HAProxy
+  hosts: loadbalancers
+  become: yes
+  tasks:
+  - name: Enable server in 'app_backend' backend pool
+    community.general.haproxy:
+      state: disabled
+      host: "{{ item }}"
+      backend: "{{ haproxy_backend_name }}"
+    delegate_to: haproxy
+    loop: "{{ haproxy_remove_nodes }}"
+    
+  handlers:
+    - name: Restart HAProxy
+      ansible.builtin.service:
+        name: haproxy
+        state: restarted
+        enable: true
