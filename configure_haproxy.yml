@@ -2,12 +2,13 @@
   hosts: loadbalancers
   become: yes
   tasks:
-  - name: Enable server in 'app_backend' backend pool
-    community.general.haproxy:
-      state: disabled
-      host: "{{ item }}"
-      backend: "{{ haproxy_backend_name }}"
+  - name: Remove server entry from HAProxy config
+    lineinfile:
+      path: /etc/haproxy/haproxy.cfg
+      regexp: "^\\s*server\\s+{{ item }}.*" # Adjust regex to match your server entry
+      state: absent
     loop: "{{ haproxy_remove_nodes }}"
+    notify: Restart HAProxy
     
   handlers:
     - name: Restart HAProxy
