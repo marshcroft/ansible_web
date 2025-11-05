@@ -7,7 +7,6 @@
       state: disabled
       host: "{{ item }}"
       backend: "{{ haproxy_backend_name }}"
-    delegate_to: haproxy
     loop: "{{ haproxy_remove_nodes }}"
     
   handlers:
