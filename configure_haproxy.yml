@@ -2,24 +2,25 @@
   hosts: all
   become: yes
   tasks:
-  block:
-    - name: Add hosts to a new group excluding one
-      ansible.builtin.add_host:
-        name: "{{ item }}"
-        groups: haproxy_app_group
-      loop: "{{ groups['webservers'] | difference([server_that_failed]) }}
-      run_once: true # Ensures this task runs only once for all hosts
+  - name: HAProxy block
+    block:
+      - name: Add hosts to a new group excluding one
+        ansible.builtin.add_host:
+          name: "{{ item }}"
+          groups: haproxy_app_group
+        loop: "{{ groups['webservers'] | difference([server_that_failed]) }}
+        run_once: true # Ensures this task runs only once for all hosts
         
-    - name: Deploy HAProxy configuration
-      ansible.builtin.template:
-        src: haproxy1.cfg.j2
-        dest: /etc/haproxy/haproxy.cfg
-        owner: root
-        group: root
-        mode: '0644'
-      notify: Restart HAProxy
-  run_once: true
-  delegate_to: haproxy
+      - name: Deploy HAProxy configuration
+        ansible.builtin.template:
+          src: haproxy1.cfg.j2
+          dest: /etc/haproxy/haproxy.cfg
+          owner: root
+          group: root
+          mode: '0644'
+        notify: Restart HAProxy
+    run_once: true
+    delegate_to: haproxy
   
   handlers:
     - name: Restart HAProxy
