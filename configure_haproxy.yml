@@ -42,6 +42,9 @@
           name: haproxy
           state: restarted
           enabled: true
+        run_once: true
+        delegate_to: haproxy_server
+        
   post_tasks:
   - name: Create Grafana annotation for job finish
     ansible.builtin.uri:
@@ -59,6 +62,5 @@
           - SNOW_Number "{{ ansible_eda.event.request_number }}"
     delegate_to: localhost
     run_once: true
-        run_once: true
-        delegate_to: haproxy_server
+
  
