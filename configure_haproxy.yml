@@ -6,7 +6,7 @@
         ansible.builtin.add_host:
           name: "{{ item }}"
           groups: haproxy_app_group
-        loop: "{{ groups['webservers'] | difference([server_that_failed]) }}
+        loop: "{{ groups['webservers'] | difference([server_that_failed]) }}"
         run_once: true
         delegate_to: haproxy
         
