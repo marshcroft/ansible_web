@@ -1,6 +1,23 @@
 - name: Configure HAProxy
   hosts: all
   become: yes
+  pre_tasks:
+  - name: Create Grafana annotation for job start
+    ansible.builtin.uri:
+      url: "{{grafana_url }}/api/annotations"
+      method: POST
+      body_format: json
+      headers:
+        Content-Type: application/json
+        Authorization: "Bearer {{ grafana_token }}"
+      body:
+        text: "Step {{ grafana_job_number | default ('1') }} of {{ grafana_job_total_number | default ('1') }} started"
+        dashboardId: 6
+        panelId: 65
+        tags:
+          - SNOW_Number "{{ ansible_eda.event.request_number }}"
+    delegate_to: localhost
+    run_once: true
   tasks:
       - name: Add hosts to a new group excluding one
         ansible.builtin.add_host:
@@ -25,6 +42,23 @@
           name: haproxy
           state: restarted
           enabled: true
+  post_tasks:
+  - name: Create Grafana annotation for job finish
+    ansible.builtin.uri:
+      url: "{{grafana_url }}/api/annotations"
+      method: POST
+      body_format: json
+      headers:
+        Content-Type: application/json
+        Authorization: "Bearer {{ grafana_token }}"
+      body:
+        text: "Step {{ grafana_job_number | default ('1') }} of {{ grafana_job_total_number | default ('1') }} completed"
+        dashboardId: 6
+        panelId: 65
+        tags:
+          - SNOW_Number "{{ ansible_eda.event.request_number }}"
+    delegate_to: localhost
+    run_once: true
         run_once: true
         delegate_to: haproxy_server
  
