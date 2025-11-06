@@ -1,15 +1,26 @@
 - name: Configure HAProxy
-  hosts: loadbalancers
+  hosts: all
   become: yes
   tasks:
-  - name: Remove server entry from HAProxy config
-    lineinfile:
-      path: /etc/haproxy/haproxy.cfg
-      regexp: "^\\s*server\\s+{{ item }}.*" # Adjust regex to match your server entry
-      state: absent
-    loop: "{{ haproxy_remove_nodes }}"
-    notify: Restart HAProxy
-    
+  block:
+    - name: Add hosts to a new group excluding one
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        groups: haproxy_app_group
+      loop: "{{ groups['webservers'] | difference([excluded_host]) }}
+      run_once: true # Ensures this task runs only once for all hosts
+        
+    - name: Deploy HAProxy configuration
+      ansible.builtin.template:
+        src: haproxy1.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart HAProxy
+  run_once: true
+  delegate_to: haproxy
+  
   handlers:
     - name: Restart HAProxy
       ansible.builtin.service:
