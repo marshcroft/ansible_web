@@ -18,13 +18,13 @@
           owner: root
           group: root
           mode: '0644'
-        notify: Restart HAProxy
+
+      - name: Restart HAProxy
+        ansible.builtin.service:
+          name: haproxy
+          state: restarted
+          enabled: true
+          
     run_once: true
     delegate_to: haproxy
-  
-  handlers:
-    - name: Restart HAProxy
-      ansible.builtin.service:
-        name: haproxy
-        state: restarted
-        enabled: true
+ 
